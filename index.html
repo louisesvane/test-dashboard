@@ -94,6 +94,12 @@
   .footer { margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
   .footer span { font-size: 14px; color: var(--dim); }
   .reset-btn { font-size: 14px; color: var(--dim); background: none; border: none; cursor: pointer; text-decoration: underline; }
+  @keyframes logo-hue {
+    0%   { filter: brightness(0) invert(1) hue-rotate(0deg) saturate(3); }
+    33%  { filter: brightness(0) invert(1) hue-rotate(120deg) saturate(3); }
+    66%  { filter: brightness(0) invert(1) hue-rotate(240deg) saturate(3); }
+    100% { filter: brightness(0) invert(1) hue-rotate(360deg) saturate(3); }
+  }
   @keyframes shimmer {
     0%   { background-position: 0% 50%; }
     50%  { background-position: 100% 50%; }
@@ -175,7 +181,7 @@
       </div>
     </div>
     <div style="display:flex;align-items:center;">
-      <img id="xflow-logo" src="" style="height:80px;width:auto;filter:brightness(0) invert(1);" alt="XFlow logo">
+      <img id="xflow-logo" src="" style="height:80px;width:auto;filter:brightness(0) saturate(100%) invert(64%) sepia(69%) saturate(400%) hue-rotate(95deg) brightness(95%);" alt="XFlow logo">
     </div>
   </div>
 
