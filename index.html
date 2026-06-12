@@ -241,7 +241,7 @@
       </div>
       <div style="height:1rem;"></div>
       <div style="border-radius:var(--r);overflow:hidden;border:1px solid var(--border);width:100%;"><div class="stat-table">
-        <div class="stat-row" style="background:rgba(85,85,85,0.12);"><span class="stat-dot" style="background:var(--dim);border:1px solid #777"></span><span class="stat-label">To Do</span><span class="stat-val" id="t-todo">—</span></div>
+        <div class="stat-row" style="background:rgba(96,165,250,0.06);"><span class="stat-dot" style="background:var(--blue)"></span><span class="stat-label">Ready for Testing</span><span class="stat-val" id="t-todo">—</span></div>
         <div class="stat-row" style="background:rgba(167,139,250,0.06);"><span class="stat-dot" style="background:var(--purple)"></span><span class="stat-label">In Testing</span><span class="stat-val" id="t-testing">—</span></div>
         <div class="stat-row" style="background:rgba(74,222,128,0.06);"><span class="stat-dot" style="background:var(--green)"></span><span class="stat-label">Done</span><span class="stat-val" id="t-done">—</span></div>
         </div></div>
@@ -400,7 +400,7 @@ async function fetchData(key, pid) {
         project(id: $id) {
           name description
           projectMilestones { nodes { name description targetDate } }
-          issues(filter: { state: { type: { nin: ["cancelled"] } }, team: { name: { eq: "XFlow" } } }, orderBy: updatedAt, first: 100) {
+          issues(filter: { state: { name: { in: ["Ready for Testing", "In Testing", "Done"] } }, team: { name: { eq: "XFlow" } } }, orderBy: updatedAt, first: 100) {
             nodes { id state { name type } }
           }
         }
@@ -530,7 +530,7 @@ async function fetchTestData(key, tpid) {
     const data = await gql(key, `
       query($id: String!) {
         project(id: $id) {
-          issues(filter: { state: { type: { nin: ["cancelled"] } }, team: { name: { eq: "XFlow" } } }, first: 100) {
+          issues(filter: { state: { name: { in: ["Ready for Testing", "In Testing", "Done"] } }, team: { name: { eq: "XFlow" } } }, first: 100) {
             nodes { id state { name type } }
           }
         }
@@ -540,7 +540,7 @@ async function fetchTestData(key, tpid) {
     const total   = issues.length;
     const intest  = issues.filter(i => (i.state?.name||'').toLowerCase().trim() === 'in testing').length;
     const done    = issues.filter(i => (i.state?.name||'').toLowerCase().trim() === 'done').length;
-    const todo    = total - intest - done;
+    const todo    = issues.filter(i => (i.state?.name||'').toLowerCase().trim() === 'ready for testing').length;
     const pct = total ? Math.round((done / total) * 100) : 0;
 
     const safeSetT = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
