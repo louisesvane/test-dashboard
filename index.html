@@ -3,7 +3,6 @@
 <head>
 <meta charset="UTF-8">
 <title>Testdag — XFlow</title>
-<meta http-equiv="refresh" content="60">
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
   :root {
@@ -222,6 +221,7 @@
       <div style="border-radius:var(--r);overflow:hidden;border:1px solid var(--border);width:100%;"><div class="stat-table" id="release-stats">
         <div class="stat-row" style="background:rgba(96,165,250,0.06);"><span class="stat-dot" style="background:var(--blue)"></span><span class="stat-label">Ready for Testing</span><span class="stat-val" id="r-inprogress">—</span></div>
         <div class="stat-row" style="background:rgba(167,139,250,0.06);"><span class="stat-dot" style="background:var(--purple)"></span><span class="stat-label">In Testing</span><span class="stat-val" id="r-testing">—</span></div>
+        <div class="stat-row" style="background:rgba(251,191,36,0.06);"><span class="stat-dot" style="background:var(--amber)"></span><span class="stat-label">Afventer ekstern test</span><span class="stat-val" id="r-ekstern">—</span></div>
         <div class="stat-row" style="background:rgba(74,222,128,0.06);"><span class="stat-dot" style="background:var(--green)"></span><span class="stat-label">Done</span><span class="stat-val" id="r-done">—</span></div>
       </div></div>
       <div class="stat-row stat-total" style="padding:14px 16px;"><span class="stat-label" style="color:var(--text);font-weight:600;">Total</span><span class="stat-val" id="r-total">—</span></div>
@@ -400,7 +400,7 @@ async function fetchData(key, pid) {
         project(id: $id) {
           name description
           projectMilestones { nodes { name description targetDate } }
-          issues(filter: { state: { name: { in: ["Ready for Testing", "In Testing", "Done"] } }, team: { name: { eq: "XFlow" } } }, orderBy: updatedAt, first: 100) {
+          issues(filter: { state: { name: { in: ["Ready for Testing", "In Testing", "Afventer ekstern test", "Done"] } }, team: { name: { eq: "XFlow" } } }, orderBy: updatedAt, first: 100) {
             nodes { id state { name type } }
           }
         }
@@ -496,14 +496,16 @@ async function fetchData(key, pid) {
     const total      = issues.length;
     const ready   = issues.filter(i => (i.state?.name||'').toLowerCase().trim() === 'ready for testing').length;
     const testing = issues.filter(i => (i.state?.name||'').toLowerCase().trim() === 'in testing').length;
+    const ekstern = issues.filter(i => (i.state?.name||'').toLowerCase().trim() === 'afventer ekstern test').length;
     const done    = issues.filter(i => (i.state?.name||'').toLowerCase().trim() === 'done').length;
-    const visibleTotal = ready + testing + done;
+    const visibleTotal = ready + testing + ekstern + done;
     const pct = visibleTotal ? Math.round((done / visibleTotal) * 100) : 0;
 
     const safeSet = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
     const safeHtml = (id, val) => { const el = document.getElementById(id); if (el) el.innerHTML = val; };
     safeSet('r-inprogress', ready);
     safeSet('r-testing', testing);
+    safeSet('r-ekstern', ekstern);
     safeSet('r-done', done);
     safeSet('r-total', visibleTotal);
     safeHtml('r-center-pct', pct + '<span style="font-size:32px;font-weight:400;color:var(--muted);margin-left:6px;">%</span>');
@@ -580,6 +582,11 @@ window.addEventListener('load', () => {
 });
 
 document.getElementById('inp-key').addEventListener('keydown', e => { if (e.key === 'Enter') submitKey(); });
+
+// Hard reload every 60 seconds to pick up new deployments from GitHub
+setInterval(() => {
+  window.location.href = window.location.href.split('?')[0] + '?v=' + Date.now();
+}, 60 * 1000);
 </script>
 <canvas id="confetti-canvas"></canvas>
 
