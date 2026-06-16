@@ -499,7 +499,7 @@ async function fetchData(key, pid) {
     const ekstern = issues.filter(i => (i.state?.name||'').toLowerCase().trim() === 'afventer ekstern test').length;
     const done    = issues.filter(i => (i.state?.name||'').toLowerCase().trim() === 'done').length;
     const visibleTotal = ready + testing + ekstern + done;
-    const pct = visibleTotal ? Math.round((done / visibleTotal) * 100) : 0;
+    const pct = visibleTotal ? Math.round(((done + ekstern) / visibleTotal) * 100) : 0;
 
     const safeSet = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
     const safeHtml = (id, val) => { const el = document.getElementById(id); if (el) el.innerHTML = val; };
@@ -511,7 +511,7 @@ async function fetchData(key, pid) {
     safeHtml('r-center-pct', pct + '<span style="font-size:32px;font-weight:400;color:var(--muted);margin-left:6px;">%</span>');
     const rFill = document.getElementById('r-prog-fill');
     if (rFill) { rFill.style.width = pct + '%'; rFill.className = pct > 0 ? 'prog-animated' : ''; rFill.style.background = pct === 0 ? '' : null; }
-    safeSet('r-prog-count', done + ' / ' + visibleTotal + ' done');
+    safeSet('r-prog-count', (done + ekstern) + ' / ' + visibleTotal + ' done');
     window._releasePct = pct;
     updateConfetti();
 
