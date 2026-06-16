@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <title>Testdag — XFlow</title>
+<meta name="app-version" content="1781622943">
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
   :root {
@@ -583,10 +584,18 @@ window.addEventListener('load', () => {
 
 document.getElementById('inp-key').addEventListener('keydown', e => { if (e.key === 'Enter') submitKey(); });
 
-// Hard reload every 60 seconds to pick up new deployments from GitHub
-setInterval(() => {
-  window.location.href = window.location.href.split('?')[0] + '?v=' + Date.now();
-}, 60 * 1000);
+// Check for new version every 2 minutes — only reload if version has changed
+const currentVersion = document.querySelector('meta[name="app-version"]')?.content;
+setInterval(async () => {
+  try {
+    const res = await fetch(window.location.href.split('?')[0] + '?nocache=' + Date.now(), { cache: 'no-store' });
+    const html = await res.text();
+    const match = html.match(/name="app-version" content="([^"]+)"/);
+    if (match && match[1] !== currentVersion) {
+      window.location.reload(true);
+    }
+  } catch(e) {}
+}, 2 * 60 * 1000);
 </script>
 <canvas id="confetti-canvas"></canvas>
 
