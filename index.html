@@ -592,7 +592,7 @@ setInterval(async () => {
     const html = await res.text();
     const match = html.match(/name="app-version" content="([^"]+)"/);
     if (match && match[1] !== currentVersion) {
-      window.location.reload(true);
+      window.location.href = window.location.href.split("?")[0] + "?v=" + match[1];
     }
   } catch(e) {}
 }, 2 * 60 * 1000);
