@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <title>Testdag — XFlow</title>
-<meta name="app-version" content="1795425370">
+<meta name="app-version" content="1795436848">
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
   :root {
@@ -225,6 +225,7 @@
         <div class="stat-row" style="background:rgba(251,191,36,0.06);"><span class="stat-dot" style="background:var(--amber)"></span><span class="stat-label">Afventer ekstern test <span style="opacity:0.5;font-size:0.85em;">(intern test done)</span></span><span class="stat-val" id="r-ekstern">—</span></div>
         <div class="stat-row" style="background:rgba(74,222,128,0.06);"><span class="stat-dot" style="background:var(--green)"></span><span class="stat-label">Done</span><span class="stat-val" id="r-done">—</span></div>
       </div></div>
+      <div id="release-error" style="display:none;padding:0.5rem 0.25rem 0;color:var(--muted);font-size:13px;"></div>
       <div class="stat-row stat-total" style="padding:14px 16px;"><span class="stat-label" style="color:var(--text);font-weight:600;">Total</span><span class="stat-val" id="r-total">—</span></div>
     </div>
 
@@ -519,11 +520,12 @@ async function fetchData(key, pid) {
 
 
     const n = new Date();
+    { const errEl = document.getElementById('release-error'); if (errEl) errEl.style.display = 'none'; }
     (document.getElementById('last-updated') || {}).textContent = 'Sidst opdateret: ' + String(n.getHours()).padStart(2,'0') + ':' + String(n.getMinutes()).padStart(2,'0');
   } catch(err) {
     console.error('Release fetch error:', err.message);
-    const statsEl = document.getElementById('release-stats');
-    if (statsEl) statsEl.innerHTML = `<div style="padding:1rem;color:var(--muted);font-size:14px;">⚠ Kunne ikke hente data — siden forsøger igen om 30 sekunder.<br><small style="opacity:0.6">${esc(err.message)}</small></div>`;
+    const errEl = document.getElementById('release-error');
+    if (errEl) { errEl.textContent = '⚠ Seneste opdatering fejlede (' + err.message + ') - prøver igen om 30 sek.'; errEl.style.display = 'block'; }
   }
 }
 
